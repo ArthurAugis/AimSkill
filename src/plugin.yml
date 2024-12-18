@@ -1,0 +1,20 @@
+name: AimSkill
+main: fr.rainbowyoshi.aimskill.Main
+version: 0.1
+author: RainbowYoshi
+description: AimSkill is a plugin that allows you to improve your aim in Minecraft.
+commands:
+    aimskill:
+        description: Main command of AimSkill.
+        usage: /aimskill
+        permission: aimskill.use
+        aliases:
+        - as
+    aimskillreload:
+        description: Reload the configuration of AimSkill.
+        usage: /aimskillreload
+        permission: aimskill.reload
+        aliases:
+        - asreload
+        - asr
+
