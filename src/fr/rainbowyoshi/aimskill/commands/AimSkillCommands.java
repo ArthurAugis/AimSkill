@@ -1,9 +1,11 @@
 package fr.rainbowyoshi.aimskill.commands;
 
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import fr.rainbowyoshi.aimskill.utils.PlayerStatsYml;
+import fr.rainbowyoshi.aimskill.utils.ArenaManager;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
@@ -44,6 +46,31 @@ public class AimSkillCommands implements CommandExecutor {
             }
 
             return true;
+        } else if(cmd.getName().equalsIgnoreCase("aimskill") && args[0].equalsIgnoreCase("arena")) {
+            ArenaManager arenaManager = new ArenaManager();
+            if(args.length >= 2 && args[1].equalsIgnoreCase("create")) {
+                if(args.length == 2) {
+                    sender.sendMessage("Usage: /aimskill arena create <arenaName>");
+                    return true;
+                } else {
+                    String arenaName = "";
+                    for(int i = 2; i < args.length; i++) {
+                        arenaName += args[i] + " ";
+                    }
+
+                    arenaName = arenaName.substring(0, arenaName.length() - 1);
+
+                    Location loc = player.getLocation();
+                    double adjustedX = Math.floor(loc.getX()) + 0.5;
+                    double adjustedY = Math.floor(loc.getY());
+                    double adjustedZ = Math.floor(loc.getZ()) + 0.5;
+
+                    player.teleport(new Location(loc.getWorld(), adjustedX, adjustedY, adjustedZ));
+
+                    player.sendMessage(arenaManager.createArena(arenaName, adjustedX, adjustedY, adjustedZ, loc.getWorld().getName()));
+
+                }
+            }
         }
 
         return false;
