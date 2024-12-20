@@ -5,6 +5,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class PlayerStatsYml {
 
@@ -17,6 +19,36 @@ public class PlayerStatsYml {
         } else {
             System.out.println("Le fichier de stats pour " + player.getName() + " n'existe pas.");
             return null;
+        }
+    }
+
+    public HashMap<String, Integer> getTop(String type) {
+        File playerFolder = new File("plugins/AimSkill/players");
+        HashMap<String, Integer> playerScores = new HashMap<>();
+
+        if (playerFolder.exists() && playerFolder.isDirectory()) {
+            for (File file : playerFolder.listFiles()) {
+                if (file.isFile() && file.getName().endsWith(".yml")) {
+                    FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+                    String playerName = config.getString("playerName");
+                    int maxScore = config.getInt(type);
+                    if (playerName != null) {
+                        playerScores.put(playerName, maxScore);
+                    }
+                }
+            }
+
+            return playerScores.entrySet()
+                    .stream()
+                    .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (e1, e2) -> e1,
+                            LinkedHashMap::new));
+        } else {
+            System.out.println("Le dossier de stats n'existe pas.");
+            return new HashMap<>();
         }
     }
 
@@ -71,5 +103,39 @@ public class PlayerStatsYml {
         } else {
             System.out.println("Le fichier de stats pour " + player.getName() + " existe déjà.");
         }
+    }
+
+    public String generateTestStatsFiles(int number) {
+        File playerFolder = new File("plugins/AimSkill/players");
+
+        if (!playerFolder.exists()) {
+            playerFolder.mkdirs();
+        }
+
+        for (int i = 1; i <= number; i++) {
+            String uuid = UUID.randomUUID().toString();
+
+            File statsFile = new File(playerFolder, uuid + ".yml");
+
+            if (!statsFile.exists()) {
+                try {
+                    statsFile.createNewFile();
+
+                    FileConfiguration config = YamlConfiguration.loadConfiguration(statsFile);
+                    config.set("playerName", "TestPlayer" + i);
+                    config.set("maxScore", (int) (Math.random() * 1000));
+                    config.set("minScore", (int) (Math.random() * 100));
+                    config.set("totalScore", (int) (Math.random() * 5000));
+                    config.set("totalGames", (int) (Math.random() * 50));
+
+                    // Sauvegarde dans le fichier
+                    config.save(statsFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return number + " fichiers de stats de test ont été créés.";
     }
 }
